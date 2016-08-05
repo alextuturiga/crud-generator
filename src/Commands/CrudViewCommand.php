@@ -18,7 +18,8 @@ class CrudViewCommand extends Command
                             {--view-path= : The name of the view path.}
                             {--route-group= : Prefix of the route group.}
                             {--pk=id : The name of the primary key.}
-                            {--localize=no : Localize the view? yes|no.}';
+                            {--localize=no : Localize the view? yes|no.}
+                            {--pagination-type= : Clasic laravel pagination or ajax}';
 
     /**
      * The console command description.
@@ -169,8 +170,8 @@ class CrudViewCommand extends Command
         parent::__construct();
 
         $this->viewDirectoryPath = config('crudgenerator.custom_template')
-        ? config('crudgenerator.path')
-        : __DIR__ . '/../stubs/';
+            ? config('crudgenerator.path')
+            : __DIR__ . '/../stubs/';
 
         if (config('crudgenerator.view_columns_number')) {
             $this->defaultColumsToShow = config('crudgenerator.view_columns_number');
@@ -185,9 +186,10 @@ class CrudViewCommand extends Command
     public function handle()
     {
         $this->crudName = strtolower($this->argument('name'));
-        $this->crudNameCap = ucwords($this->crudName);
+        $this->crudNameCap = ucfirst(strtolower(snake_case(str_singular($this->argument('name')),' ')));
+
         $this->crudNameSingular = str_singular($this->crudName);
-        $this->modelName = str_singular($this->argument('name'));
+        $this->modelName = snake_case(str_singular($this->argument('name')),' ');
         $this->primaryKey = $this->option('pk');
         $this->routeGroup = ($this->option('route-group')) ? $this->option('route-group') . '/' : $this->option('route-group');
         $this->viewName = snake_case($this->argument('name'), '-');
@@ -244,7 +246,11 @@ class CrudViewCommand extends Command
         }
 
         // For index.blade.php file
-        $indexFile = $this->viewDirectoryPath . 'index.blade.stub';
+        if ( ($this->option('pagination-type')) && ($this->option('pagination-type') == 'ajax') )
+            $indexFile = $this->viewDirectoryPath . 'index_ajax.blade.stub';
+        else
+            $indexFile = $this->viewDirectoryPath . 'index.blade.stub';
+
         $newIndexFile = $path . 'index.blade.php';
         if (!File::copy($indexFile, $newIndexFile)) {
             echo "failed to copy $indexFile...\n";

@@ -39,8 +39,8 @@ class CrudModelCommand extends GeneratorCommand
     protected function getStub()
     {
         return config('crudgenerator.custom_template')
-        ? config('crudgenerator.path') . '/model.stub'
-        : __DIR__ . '/../stubs/model.stub';
+            ? config('crudgenerator.path') . '/model.stub'
+            : __DIR__ . '/../stubs/model.stub';
     }
 
     /**

@@ -55,8 +55,8 @@ class CrudLangCommand extends Command
         parent::__construct();
 
         $this->viewDirectoryPath = config('crudgenerator.custom_template')
-        ? config('crudgenerator.path')
-        : __DIR__ . '/../stubs/';
+            ? config('crudgenerator.path')
+            : __DIR__ . '/../stubs/';
     }
 
     /**

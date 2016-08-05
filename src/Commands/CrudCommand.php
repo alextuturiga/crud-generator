@@ -21,7 +21,10 @@ class CrudCommand extends Command
                             {--namespace= : Namespace of the controller.}
                             {--route-group= : Prefix of the route group.}
                             {--localize=no : Localize the generated files? yes|no. }
-                            {--locales=en : Locales to create lang files for.}';
+                            {--locales=en : Locales to create lang files for.}
+                            {--search-fields= : Search fields in listing.}
+                            {--pagination-type= : Clasic laravel pagination or ajax}
+                            {--where-has= : Joins with existing models}';
 
     /**
      * The console command description.
@@ -66,6 +69,7 @@ class CrudCommand extends Command
         $fields = $this->option('fields');
         $primaryKey = $this->option('pk');
         $viewPath = $this->option('view-path');
+        $paginationType = $this->option('pagination-type');
 
         $fieldsArray = explode(',', $fields);
         $requiredFieldsStr = '';
@@ -77,7 +81,7 @@ class CrudCommand extends Command
 
             $currentField = trim($spareParts[0]);
             $requiredFieldsStr .= (isset($spareParts[2]))
-            ? "'$currentField' => '{$spareParts[2]}', " : '';
+                ? "'$currentField' => '{$spareParts[2]}', " : '';
         }
 
         $commaSeparetedString = implode("', '", $fillableArray);
@@ -85,13 +89,16 @@ class CrudCommand extends Command
 
         $requiredFields = ($requiredFieldsStr != '') ? "[" . $requiredFieldsStr . "]" : '';
 
+
+        $searchFields =  $this->option('search-fields');
+
         $localize = $this->option('localize');
         $locales = $this->option('locales');
 
-        $this->call('crud:controller', ['name' => $controllerNamespace . $name . 'Controller', '--crud-name' => $name, '--model-name' => $modelName, '--view-path' => $viewPath, '--required-fields' => $requiredFields, '--route-group' => $routeGroup]);
+        $this->call('crud:controller', ['name' => $controllerNamespace . $name . 'Controller', '--crud-name' => $name, '--model-name' => $modelName, '--view-path' => $viewPath, '--required-fields' => $requiredFields, '--search-fields' => $searchFields, '--pagination-type' => $paginationType, '--route-group' => $routeGroup]);
         $this->call('crud:model', ['name' => $modelName, '--fillable' => $fillable, '--table' => $tableName, '--pk' => $primaryKey]);
         $this->call('crud:migration', ['name' => $migrationName, '--schema' => $fields, '--pk' => $primaryKey]);
-        $this->call('crud:view', ['name' => $name, '--fields' => $fields, '--view-path' => $viewPath, '--route-group' => $routeGroup, '--localize' => $localize, '--pk' => $primaryKey]);
+        $this->call('crud:view', ['name' => $name, '--fields' => $fields, '--view-path' => $viewPath, '--route-group' => $routeGroup, '--localize' => $localize, '--pagination-type' => $paginationType, '--pk' => $primaryKey]);
         if ($localize == 'yes') {
             $this->call('crud:lang', ['name' => $name, '--fields' => $fields, '--locales' => $locales]);
         }

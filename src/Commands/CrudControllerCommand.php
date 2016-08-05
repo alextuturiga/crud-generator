@@ -17,7 +17,9 @@ class CrudControllerCommand extends GeneratorCommand
                             {--model-name= : The name of the Model.}
                             {--view-path= : The name of the view path.}
                             {--required-fields= : Required fields for validations.}
-                            {--route-group= : Prefix of the route group.}';
+                            {--route-group= : Prefix of the route group.}
+                            {--search-fields= : Search fields in listing.}
+                            {--pagination-type= : Clasic laravel pagination or ajax}';
 
     /**
      * The console command description.
@@ -40,9 +42,14 @@ class CrudControllerCommand extends GeneratorCommand
      */
     protected function getStub()
     {
+        if ( ($this->option('pagination-type')) && ($this->option('pagination-type') == 'ajax') )
+            return config('crudgenerator.custom_template')
+                ? config('crudgenerator.path') . '/controller_ajax.stub'
+                : __DIR__ . '/../stubs/controller_ajax.stub';
+
         return config('crudgenerator.custom_template')
-        ? config('crudgenerator.path') . '/controller.stub'
-        : __DIR__ . '/../stubs/controller.stub';
+            ? config('crudgenerator.path') . '/controller.stub'
+            : __DIR__ . '/../stubs/controller.stub';
     }
 
     /**
@@ -66,7 +73,7 @@ class CrudControllerCommand extends GeneratorCommand
      */
     protected function buildClass($name)
     {
-        $stub = $this->files->get($this->getStub());
+        $stub = $this->files->get($this->getStub($this->option('pagination-type')));
 
         $viewPath = $this->option('view-path') ? $this->option('view-path') . '.' : '';
         $crudName = strtolower($this->option('crud-name'));
@@ -80,6 +87,8 @@ class CrudControllerCommand extends GeneratorCommand
             $validationRules = "\$this->validate(\$request, " . $this->option('required-fields') . ");\n";
         }
 
+        $searchFields = $this->option('search-fields');
+
         return $this->replaceNamespace($stub, $name)
             ->replaceViewPath($stub, $viewPath)
             ->replaceViewName($stub, $viewName)
@@ -88,6 +97,7 @@ class CrudControllerCommand extends GeneratorCommand
             ->replaceModelName($stub, $modelName)
             ->replaceRouteGroup($stub, $routeGroup)
             ->replaceValidationRules($stub, $validationRules)
+            ->replaceSearchFields($stub, $searchFields)
             ->replaceClass($stub, $name);
     }
 
@@ -205,6 +215,24 @@ class CrudControllerCommand extends GeneratorCommand
     {
         $stub = str_replace(
             '{{validationRules}}', $validationRules, $stub
+        );
+
+        return $this;
+    }
+
+
+    protected function replaceSearchFields(&$stub, $searchFields)
+    {
+        $fields = explode(',', $searchFields);
+//        dd($fields);
+        $searchFieldsConditions = '';
+        foreach ($fields as $field)
+        {
+            $searchFieldsConditions .= "\t\t\t\t".'$q->orWhere(\''. trim($field) .'\', \'LIKE\', \'%\'. $table_search .\'%\');'."\n";
+        }
+
+        $stub = str_replace(
+            '{{searchFieldsConditions}}', $searchFieldsConditions, $stub
         );
 
         return $this;
