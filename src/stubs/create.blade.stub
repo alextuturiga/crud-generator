@@ -1,29 +1,97 @@
-@extends('layouts.app')
+@extends('datacom.partiale.index')
+
+@section('title', 'Adauga %%modelName%%')
+
+@section('sidebar')
+    @parent
+
+@stop
+
+@section('css')
+    <!-- Select2 -->
+    <link rel="stylesheet" href="/assets/plugins/select2/select2.min.css">
+@endsection
 
 @section('content')
-<div class="container">
 
-    <h1>Create New %%modelName%%</h1>
-    <hr/>
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+        <h1>
+            Adauga %%modelName%%
+        </h1>
+        <ol class="breadcrumb">
+            <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
+            <li><a href="#">%%modelName%% </a></li>
+            <li class="active">Adauga %%modelName%% </li>
+        </ol>
+    </section>
 
-    {!! Form::open(['url' => '/%%routeGroup%%%%viewName%%', 'class' => 'form-horizontal']) !!}
 
-    %%formFieldsHtml%%
+    <!-- Main content -->
+        <section class="content">
 
-    <div class="form-group">
-        <div class="col-sm-offset-3 col-sm-3">
-            {!! Form::submit('Create', ['class' => 'btn btn-primary form-control']) !!}
-        </div>
-    </div>
-    {!! Form::close() !!}
+            <!-- SELECT2 EXAMPLE -->
+            <div class="box box-success">
+                <div class="box-header with-border">
+                    <h3 class="box-title">Adauga %%modelName%%</h3>
 
-    @if ($errors->any())
-        <ul class="alert alert-danger">
-            @foreach ($errors->all() as $error)
-                <li>{{ $error }}</li>
-            @endforeach
-        </ul>
-    @endif
+                    <div class="box-tools pull-right">
+                    </div>
+                </div>
+                <!-- /.box-header -->
 
-</div>
+
+                @if ($errors->any())
+                    <ul class="alert alert-danger">
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                @endif
+
+
+                <div class="box-body">
+                    {!! Form::open(['url' => '/%%routeGroup%%%%viewName%%', 'class' => 'form-horizontal']) !!}
+
+                    %%formFieldsHtml%%
+
+
+                    <div class="form-group">
+                        <div class="col-sm-offset-3 col-sm-3">
+                            {!! Form::submit('Create', ['class' => 'btn btn-primary form-control']) !!}
+                        </div>
+                    </div>
+
+                    {!! Form::close() !!}
+
+                </div>
+                <!-- /.box-body -->
+
+
+                <div class="box-footer">
+
+                </div>
+            </div>
+            <!-- /.box -->
+
+
+        </section>
+        <!-- /.content -->
+
+
+@endsection
+
+@section('postfooter')
+
+    <!-- Select2 -->
+    <script src="/assets/plugins/select2/select2.full.min.js"></script>
+
+    <script type="text/javascript">
+        $(function () {
+            //Initialize Select2 Elements
+            $(".select2").select2();
+
+
+        });
+    </script>
 @endsection

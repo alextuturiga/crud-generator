@@ -23,14 +23,14 @@ class DummyClass extends Controller
         $table_search = Input::get('table_search');
 
         if (empty($table_search)) {
-            ${{crudName}} = {{modelName}}::paginate(15);
+            ${{crudName}} = {{modelName}}::get();
         }
         else {
             ${{crudName}} = {{modelName}}::where(function($q) use ($table_search) {
                 $q->where('id','LIKE','%'.$table_search.'%');
 {{searchFieldsConditions}}
             })
-                ->paginate(15);
+                ->get();
         }
 
         return view('{{viewPath}}{{viewName}}.index', compact('{{crudName}}','table_search'));
